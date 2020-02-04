@@ -23,6 +23,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#define PARMPREFIX '-'
 static int parm_argc = 0;
 static char **parm_argv = NULL;
 
@@ -383,19 +384,28 @@ static void T_OutputError(const char *format, ...)
 
 static int Parm_ParseParameter(char *parmstring, int p_argc)
 {
+	char *argument = NULL;
 	if (p_argc >= parm_argc)
 		return p_argc+1;
 
+	argument = parm_argv[p_argc];
+	if (argument[0] == PARMPREFIX) // ???
+		return p_argc;
+
 	if (!stricmp(parmstring, "palette"))
-		parm_palettefile = parm_argv[p_argc];
+		parm_palettefile =argument;
 	else if (!stricmp(parmstring, "outfiles"))
 	{
-		char *outfiles = parm_argv[p_argc];
+		char *outfiles = argument;
 		if (outfiles[0])
 			parm_outfiles = outfiles;
 	}
 	else if (!stricmp(parmstring, "outprefix"))
-		parm_outprefix = parm_argv[p_argc];
+	{
+		char *outprefix = argument;
+		if (outprefix[0])
+			parm_outprefix = outprefix;
+	}
 	else if (!stricmp(parmstring, "blendstyle"))
 	{
 		char *stylestring = parm_argv[p_argc];
@@ -420,7 +430,7 @@ static void Parm_Parse(void)
 	for (i = 1; i < parm_argc;)
 	{
 		char *parmstring = parm_argv[i];
-		if (parmstring[0] == '-' && parmstring[1])
+		if (parmstring[0] == PARMPREFIX && parmstring[1])
 			i = Parm_ParseParameter(parmstring+1, i+1);
 		else
 			i++;
