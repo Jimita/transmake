@@ -72,8 +72,9 @@ static void T_OutputError(const char *format, ...);
 // Palette reading
 //
 
-#define PALSIZE (256 * 3)
-static unsigned char rpalette[PALSIZE];
+#define PALSIZE 256
+#define RPALSIZE (PALSIZE * 3)
+static unsigned char rpalette[RPALSIZE];
 static RGBA_t palette[PALSIZE];
 
 static void Pal_Read(const char *inpal)
@@ -93,7 +94,7 @@ static void Pal_Read(const char *inpal)
 	fseek(fp, 0, SEEK_END);
 	size = ftell(fp);
 
-	if (size < PALSIZE)
+	if (size < RPALSIZE)
 	{
 		T_OutputError("Palette file has incorrect size!");
 		exit(EXIT_FAILURE);
@@ -101,14 +102,14 @@ static void Pal_Read(const char *inpal)
 
 	// Seek back, then read it
 	fseek(fp, 0, SEEK_SET);
-	if (fread(&rpalette, PALSIZE, 1, fp) != 1)
+	if (fread(&rpalette, RPALSIZE, 1, fp) != 1)
 	{
 		T_OutputError("Couldn't read palette file!");
 		exit(EXIT_FAILURE);
 	}
 
 	// Make RGBA palette
-	for (i = 0, j = 0; i < 256, j < PALSIZE; i++, j += 3)
+	for (i = 0, j = 0; i < PALSIZE, j < RPALSIZE; i++, j += 3)
 	{
 		palette[i].s.red   = rpalette[j];
 		palette[i].s.green = rpalette[j + 1];
@@ -128,7 +129,7 @@ static unsigned char NearestPaletteColor(unsigned char r, unsigned char g, unsig
 	int dr, dg, db;
 	int distortion, bestdistortion = 256 * 256 * 4, bestcolor = 0, i;
 
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < PALSIZE; i++)
 	{
 		dr = r - palette[i].s.red;
 		dg = g - palette[i].s.green;
@@ -226,9 +227,9 @@ static void T_BlendTrans(int trans)
 	unsigned char blendamt = (amtmul * trans);
 	size_t x, y;
 
-	for (y = 0; y < 256; y++)
+	for (y = 0; y < PALSIZE; y++)
 	{
-		for (x = 0; x < 256; x++)
+		for (x = 0; x < PALSIZE; x++)
 		{
 			unsigned char backcolor = y;
 			unsigned char frontcolor = x;
@@ -237,7 +238,7 @@ static void T_BlendTrans(int trans)
 			RGBA_t result;
 
 			result.rgba = ASTBlendPixel(backrgba, frontrgba, blendstyle, blendamt);
-			working[((y * 256) + x)] = NearestPaletteColor(result.s.red, result.s.green, result.s.blue);
+			working[((y * PALSIZE) + x)] = NearestPaletteColor(result.s.red, result.s.green, result.s.blue);
 		}
 	}
 }
