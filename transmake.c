@@ -389,35 +389,26 @@ static int Parm_ParseParameter(char *parmstring, int p_argc)
 		return p_argc+1;
 
 	argument = parm_argv[p_argc];
-	if (argument[0] == PARMPREFIX) // ???
+	if ((!argument[0]) || (argument[0] == PARMPREFIX))
 		return p_argc;
 
 	if (!stricmp(parmstring, "palette"))
-		parm_palettefile =argument;
+		parm_palettefile = argument;
 	else if (!stricmp(parmstring, "outfiles"))
-	{
-		char *outfiles = argument;
-		if (outfiles[0])
-			parm_outfiles = outfiles;
-	}
+		parm_outfiles = argument;
 	else if (!stricmp(parmstring, "outprefix"))
-	{
-		char *outprefix = argument;
-		if (outprefix[0])
-			parm_outprefix = outprefix;
-	}
+		parm_outprefix = argument;
 	else if (!stricmp(parmstring, "blendstyle"))
 	{
-		char *stylestring = parm_argv[p_argc];
-		if (!stricmp(stylestring, "translucent"))
+		if (!stricmp(argument, "translucent"))
 			blendstyle = AST_TRANSLUCENT;
-		else if (!stricmp(stylestring, "add"))
+		else if (!stricmp(argument, "add"))
 			blendstyle = AST_ADD;
-		else if (!stricmp(stylestring, "subtract"))
+		else if (!stricmp(argument, "subtract"))
 			blendstyle = AST_SUBTRACT;
-		else if (!stricmp(stylestring, "reversesubtract"))
+		else if (!stricmp(argument, "reversesubtract"))
 			blendstyle = AST_REVERSESUBTRACT;
-		else if (!stricmp(stylestring, "modulate"))
+		else if (!stricmp(argument, "modulate"))
 			blendstyle = AST_MODULATE;
 	}
 
